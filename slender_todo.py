@@ -2,6 +2,8 @@ import sqlite3
 
 class Slender_Todo:
 	def __init__(self):
+		self.version = 0.1
+		self.table_name = "todo"
 		self.connection = sqlite3.connect("notes-todo.db")
 		self.curser = self.connection.cursor()
 
@@ -9,9 +11,21 @@ class Slender_Todo:
 		# so we only create these two cols
 		self.curser.execute("CREATE TABLE IF NOT EXISTS todo (status TEXT, note TEXT)")
 
-	def select_all(self):
+	def print_version(self):
+		print("sl-todoer version {}".format(self.version))
+
+	def select_all(self, status):
 		# we have to explicitly include rowid otherwise it won't show up
-		res = self.curser.execute("SELECT rowid, * FROM todo")
+		# TODO: clean up and prettify result printing
+		res = None
+
+		if status == "all":
+			res = self.curser.execute("SELECT rowid, * FROM todo")
+		elif status == "not-done":
+			res = self.curser.execute("SELECT rowid, * FROM todo WHERE status = 'not done'")
+		elif status == "done":
+			res = self.curser.execute("SELECT rowid, * FROM todo WHERE status = 'done'")
+
 		print(res.fetchall())
 
 	def add(self, note):
@@ -22,4 +36,12 @@ class Slender_Todo:
 			INSERT INTO todo (status, note)
 			VALUES (?, ?)
 		""", data)
+		self.connection.commit()
+
+	def make_done(self, id):
+		self.curser.execute("""
+			UPDATE todo
+			SET status = 'done'
+			WHERE rowid = ?
+		""", (id))
 		self.connection.commit()
