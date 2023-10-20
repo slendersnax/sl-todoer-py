@@ -26,7 +26,8 @@ class Slender_Todo:
 		elif status == "done":
 			res = self.curser.execute("SELECT rowid, * FROM todo WHERE status = 'done'")
 
-		print(res.fetchall())
+		for item in res.fetchall():
+			print("{}. {} - {}".format(item[0], item[1], item[2]))
 
 	def add(self, note):
 		# doing it this way instead of text formatting to avoid sql injection attacks
@@ -44,4 +45,18 @@ class Slender_Todo:
 			SET status = 'done'
 			WHERE rowid = ?
 		""", (id))
+		self.connection.commit()
+
+	def delete(self, id):
+		self.curser.execute("""
+			DELETE FROM todo
+			WHERE rowid = ?
+		""", (id))
+		self.connection.commit()
+
+	def delete_done(self):
+		self.curser.execute("""
+			DELETE FROM todo
+			WHERE status = 'done'
+		""")
 		self.connection.commit()
