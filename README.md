@@ -2,7 +2,7 @@
 A simple todo app in Python based on the Simple CRUD checkpoint found here: https://roadmap.sh/full-stack
 
 ### usage
-`python todoer.py -COMMAND ARGS`
+`python todoer.py -[COMMAND] [ARGS]`
 
 where the possible commands are
 
@@ -14,9 +14,9 @@ where the possible commands are
 
 `-n, --new ITEM` to add a new item
 
-`-dn, --done IDs` to mark one or multiple items as 'done' based on their IDs
+`-dn, --done [IDs...]` to mark one or multiple items as 'done' based on their IDs
 
-`-del, --delete IDs` to delete one or multiple items based on their IDs
+`-del, --delete [IDs...]` to delete one or multiple items based on their IDs
 
 `-delmul, --delete-multiple STATUS` to delete multiple items using the same STATUS keywords from the `list` command
 
