@@ -2,7 +2,7 @@ import sqlite3
 
 class Slender_Todo:
 	def __init__(self):
-		self.version = 0.1
+		self.version = 1.1
 		self.table_name = "todo"
 		self.connection = sqlite3.connect("notes-todo.db")
 		self.curser = self.connection.cursor()
@@ -13,6 +13,15 @@ class Slender_Todo:
 
 	def print_version(self):
 		print("sl-todoer version {}".format(self.version))
+
+	# helper function to verify that the input given by user is just ids
+	# used in make_done and delete functions
+	def get_ids(self, argids):
+		for id in argids:
+			if not id.isnumeric():
+				return False
+
+		return [int(id) for id in argids]
 
 	def select_all(self, status):
 		# we have to explicitly include rowid otherwise it won't show up
@@ -27,11 +36,19 @@ class Slender_Todo:
 			res = self.curser.execute("SELECT rowid, * FROM todo WHERE status = 'done'")
 
 		for item in res.fetchall():
-			print("{}. {} - {}".format(item[0], item[1], item[2]))
+			print("{}. {}: {}".format(item[0], item[1], item[2]))
 
-	def add(self, note):
+	def add(self, argnew):
+		sNewItem = ""
+
+		# if the user input was not put between ""
+		if len(argnew) > 1:
+			sNewItem = " ".join(argnew)
+		else:
+			sNewItem = argnew[0]
+
 		# doing it this way instead of text formatting to avoid sql injection attacks
-		data = ("not done", note)
+		data = ("not done", sNewItem)
 
 		self.curser.execute("""
 			INSERT INTO todo (status, note)
@@ -39,24 +56,32 @@ class Slender_Todo:
 		""", data)
 		self.connection.commit()
 
-	def make_done(self, id):
-		self.curser.execute("""
-			UPDATE todo
-			SET status = 'done'
-			WHERE rowid = ?
-		""", (id))
+	def make_done(self, argids):
+		ids = self.get_ids(argids)
+
+		if ids == False:
+			print("Incorrect input. Please input only numeric IDs")
+			return -1
+
+		self.curser.executemany("UPDATE todo SET status = 'done' WHERE rowid = ?", ((id,) for id in ids))
 		self.connection.commit()
 
-	def delete(self, id):
-		self.curser.execute("""
-			DELETE FROM todo
-			WHERE rowid = ?
-		""", (id))
+	def delete(self, argids):
+		ids = self.get_ids(argids)
+
+		if ids == False:
+			print("Incorrect input. Please input only numeric IDs")
+			return -1
+
+		self.curser.executemany("DELETE FROM todo WHERE rowid = ?", ((id,) for id in ids))
 		self.connection.commit()
 
-	def delete_done(self):
-		self.curser.execute("""
-			DELETE FROM todo
-			WHERE status = 'done'
-		""")
+	def delete_multi(self, status):
+		if status == "all":
+			self.curser.execute("DELETE FROM todo")
+		elif status == "not-done":
+			self.curser.execute("DELETE FROM todo WHERE status = 'not done'")
+		elif status == "done":
+			self.curser.execute("DELETE FROM todo WHERE status = 'done'")
+
 		self.connection.commit()

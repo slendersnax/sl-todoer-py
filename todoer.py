@@ -14,17 +14,18 @@ def get_arguments():
                         metavar="ITEM",
                         help="insert a new item into the list - use \"\" to make sure that it's stored exactly like you want it to be, or don't use them because it works like that too")
 
-    main_group.add_argument("-dn", "--done", nargs=1,
-                        metavar="ID",
-                        help="marks an item as 'done'")
+    main_group.add_argument("-dn", "--done", nargs="*",
+                        metavar="IDs",
+                        help="mark the items with the IDs given (separated by space) as 'done'")
 
-    main_group.add_argument("-del", "--delete", nargs=1,
-                        metavar="ID",
-                        help="deletes an item")
+    main_group.add_argument("-del", "--delete", nargs="*",
+                        metavar="IDs",
+                        help="deletes the items with the IDs given (separated by space)")
 
-    main_group.add_argument("-deldn", "--delete-done",
-                        action="store_true",
-                        help="deletes all items marked as 'done'")
+    main_group.add_argument("-delmul", "--delete-multiple",
+                        choices=["all", "not-done", "done"],
+                        metavar="STATUS",
+                        help="deletes all items with the specified status (all is a status, yes)")
 
     main_group.add_argument("-v", "--version",
                         action="store_true")
@@ -42,20 +43,13 @@ def main():
     elif args.list:
         todo_handler.select_all(args.list)
     elif args.new:
-        sNewItem = ""
-
-        if len(args.new) > 1:
-            sNewItem = " ".join(args.new)
-        else:
-            sNewItem = args.new[0]
-
-        todo_handler.add(sNewItem)
+        todo_handler.add(args.new)
     elif args.done:
         todo_handler.make_done(args.done)
     elif args.delete:
         todo_handler.delete(args.delete)
-    elif args.delete_done:
-        todo_handler.delete_done()
+    elif args.delete_multiple:
+        todo_handler.delete_multi(args.delete_multiple)
 
 if __name__ == "__main__":
     main()
