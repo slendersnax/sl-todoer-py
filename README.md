@@ -2,7 +2,7 @@
 A simple todo app in Python based on the Simple CRUD checkpoint found here: https://roadmap.sh/full-stack
 
 ### usage
-`python todoer.py -[COMMAND] [ARGS]`
+`python todoer.py [COMMAND] [ARGS]`
 
 where the possible commands are
 
