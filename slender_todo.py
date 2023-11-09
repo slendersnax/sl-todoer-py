@@ -1,10 +1,14 @@
 import sqlite3
+import os
 
 class Slender_Todo:
 	def __init__(self):
 		self.version = 1.1
 		self.table_name = "todo"
-		self.connection = sqlite3.connect("notes-todo.db")
+
+		path = os.path.expanduser("~/.local/share/todoer/notes-todo.db")
+		self.connection = sqlite3.connect(path)
+
 		self.curser = self.connection.cursor()
 
 		# sqlite automatically creates a "primary key integer autoincrement" column called rowid
