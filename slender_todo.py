@@ -6,9 +6,12 @@ class Slender_Todo:
 		self.version = 1.1
 		self.table_name = "todo"
 
+		# create the directory - this doesn't fail even if it exists (kinda mkdir -p)
+		# expanduser is necessary to process relative paths and "~"
+		os.makedirs(os.path.expanduser("~/.local/share/todoer"), exist_ok=True)
 		path = os.path.expanduser("~/.local/share/todoer/notes-todo.db")
+		
 		self.connection = sqlite3.connect(path)
-
 		self.curser = self.connection.cursor()
 
 		# sqlite automatically creates a "primary key integer autoincrement" column called rowid
